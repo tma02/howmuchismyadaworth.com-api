@@ -14,8 +14,8 @@ public class HttpApi {
         Spark.port(port);
         Spark.get("/", ((request, response) -> "<a href=\"https://howmuchismyadaworth.com/\">https://howmuchismyadaworth.com/</a>"));
         Spark.get("/v1/value/:currency", new GetValueRoute());
-        Spark.options("/*", (request, response) -> {
 
+        Spark.options("/*", (request, response) -> {
             String accessControlRequestHeaders = request.headers("Access-Control-Request-Headers");
             if (accessControlRequestHeaders != null) {
                 response.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
@@ -30,15 +30,17 @@ public class HttpApi {
         });
 
         Spark.before((request, response) -> {
-            String origin = "https://howmuchismyadaworth.com/";
-            if (request.headers("Origin").contains("://howmuchismyadaworth.com/") || request.headers("Origin").contains("://www.howmuchismyadaworth.com/")) {
-                origin = request.headers("Origin");
+            String origin = "https://howmuchismyadaworth.com";
+            String requestOrigin = request.headers("Origin");
+            if (requestOrigin == null) {
+                requestOrigin = "";
+            }
+            if (requestOrigin.endsWith("://howmuchismyadaworth.com") || requestOrigin.endsWith("://www.howmuchismyadaworth.com")) {
+                origin = requestOrigin;
             }
             response.header("Access-Control-Allow-Origin", origin);
             response.header("Access-Control-Request-Method", "*");
             response.header("Access-Control-Allow-Headers", "*");
-            // Note: this may or may not be necessary in your particular application
-            response.type("application/json");
         });
     }
 
